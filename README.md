@@ -37,7 +37,7 @@ DBClient.execute('select * from user where user_id = ?', [39])
     .catch(e => console.log(e));
 
 ```
-
+* get an instance with database config object. About the fields, refer to the npm 'mysql2' document => getConnection(config).
 * use query("string") to execute a raw query.
 * use execute("string", Array) to build and execute a query.
 
