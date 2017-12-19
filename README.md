@@ -25,9 +25,8 @@ var DB_CONF = {
     "connectTimeout": 30000
 }
 
-const DBC = require('./database/db_client');
+const DBC = require('./promise-mysql-client/DBClient');
 var DBClient = new DBC(DB_CONF);
-
 DBClient.query('select * from user')
     .then(results => { // do stuff here })
     .catch(e => console.log(e));
