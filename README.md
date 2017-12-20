@@ -22,7 +22,7 @@ npm install config -S
 // 'yourfile.js'
 
 const DB_Client = require('./database/promise-mysql-client/index');
-// for this you need the npm config module and already have a config files in a right place
+// for this you need the npm config module and already have your config files in the right place
 
 // or 
 
@@ -37,15 +37,15 @@ var DB_CONF = {
 }
 
 const DBC = require('./database/promise-mysql-client/DBClient');
-var DBClient = new DBC(DB_CONF);
+var DB_Client = new DBC(DB_CONF);
 
 // and use like this
 
-DBClient.query('select * from user')
+DB_Client.query('select * from user')
     .then(results => { // do stuff here })
     .catch(e => console.log(e));
 
-DBClient.execute('select * from user where user_id = ?', [39])
+DB_Client.execute('select * from user where user_id = ?', [39])
     .then(results => { // do stuff here })
     .catch(e => console.log(e));
 
