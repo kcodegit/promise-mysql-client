@@ -37,11 +37,10 @@ class DBClient {
    * @throws { Promise<Error> }
    */
   execute(query, params) {
-    return arguments.length !== 2 ?
-      pRej(new Error('Invalid Arguments.')) :
-      params.length === 0 ?
-      pRej(new Error('Empty Param. Use query() for executing raw queries.')) :
-      new Promise((res, rej) => {
+    return new Promise((res, rej) => {
+      arguments.length !== 2 ? rej(new Error('Invalid Arguments. execute function takes two arguments.')) :
+      typeof query !== 'string' ? rej(new Error('Invalid Argument. The query needs to be string.')) :
+      params.length === 0 ? rej(new Error('Empty Param. Use query() for executing raw queries.')) :
       this.getConnection()
         .then(_ => {
           this.connection.execute(query, params, (err, rows) => {
@@ -60,6 +59,8 @@ class DBClient {
    */
   query(query) {
     return new Promise((res, rej) => {
+      arguments.length !== 1 ? rej(new Error('Invalid Arguments. query function takes one argument.')) :
+      typeof query !== 'string' ? rej(new Error('Invalid Argument. The query needs to be string.')) :
       this.getConnection()
         .then(_ => {
           this.connection.query(query, (err, rows) => {
@@ -69,6 +70,7 @@ class DBClient {
         });
     });
   }
+
   /**
    * get connection
    * @return { Promise }
@@ -77,6 +79,7 @@ class DBClient {
   getConnection(){
     return new Promise((res, rej) => this.connection.connect(err => err ? rej(err) : res())); 
   }  
+  
   /**
    * end connection
    * @return { Promise }
