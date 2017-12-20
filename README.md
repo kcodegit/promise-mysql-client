@@ -8,12 +8,23 @@ A Promise-wrapped mysql database client.
 
 ### npm dependencies
 ```
-npm install bluebird -S (this is optional)
+npm install bluebird -S
 npm install mysql2 -S
+
+(optional)
+npm install config -S
 ```
 
 ## Start Guide
+* import 'PATH/promise-mysql-client/index' to use npm config module
+* import 'PATH/promise-mysql-client/classes/DBClient' to configure by yourself
 ```
+// 'yourfile.js'
+
+const DB_Client = require('./database/promise-mysql-client/index');
+// for this you need the npm config module and already have a config files in a right place
+
+// or 
 
 var DB_CONF = {
     "host": "localhost",
@@ -25,8 +36,11 @@ var DB_CONF = {
     "connectTimeout": 30000
 }
 
-const DBC = require('./promise-mysql-client/DBClient');
+const DBC = require('./database/promise-mysql-client/DBClient');
 var DBClient = new DBC(DB_CONF);
+
+// and use like this
+
 DBClient.query('select * from user')
     .then(results => { // do stuff here })
     .catch(e => console.log(e));
@@ -36,6 +50,7 @@ DBClient.execute('select * from user where user_id = ?', [39])
     .catch(e => console.log(e));
 
 ```
+* about the npm config module, see their document to see where to place your config files.
 * get an instance with database config object. About the fields, refer to the npm 'mysql2' document => getConnection(config).
 * use query("string") to execute a raw query.
 * use execute("string", Array) to build and execute a query.
