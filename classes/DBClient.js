@@ -2,7 +2,7 @@
  *  Database connection and executing queries
  */
 
- 'use strict';
+'use strict';
 
 // imports
 const Promise = require('bluebird');
@@ -25,7 +25,7 @@ const pRej = e => Promise.reject(e);
  */
 class DBClient {
   constructor(DB_CONF) {
-    this.connection = new mysql.createConnection(DB_CONF);
+    this.CONF = DB_CONF;
   }
 
   /**
@@ -38,16 +38,18 @@ class DBClient {
    */
   execute(query, params) {
     return new Promise((res, rej) => {
+      var conn = new mysql.createConnection(this.CONF);
       arguments.length !== 2 ? rej(new Error('Invalid Arguments. execute function takes two arguments.')) :
       typeof query !== 'string' ? rej(new Error('Invalid Argument. The query needs to be string.')) :
       params.length === 0 ? rej(new Error('Empty Param. Use query() for executing raw queries.')) :
-      this.getConnection()
+      this.getConnection(conn)
         .then(_ => {
-          this.connection.execute(query, params, (err, rows) => {
-            this.endConnection();
+          conn.execute(query, params, (err, rows) => {
+            this.endConnection(conn);
             err ? rej(err) : res(Array.isArray(rows) ? _cleanResult(rows) : rows);
           });
-        });
+        })
+        .catch(e => rej(e));
     });
   }
 
@@ -59,15 +61,17 @@ class DBClient {
    */
   query(query) {
     return new Promise((res, rej) => {
+      var conn = new mysql.createConnection(this.CONF);
       arguments.length !== 1 ? rej(new Error('Invalid Arguments. query function takes one argument.')) :
       typeof query !== 'string' ? rej(new Error('Invalid Argument. The query needs to be string.')) :
-      this.getConnection()
+      this.getConnection(conn)
         .then(_ => {
-          this.connection.query(query, (err, rows) => {
-            this.endConnection();
+          conn.query(query, (err, rows) => {
+            this.endConnection(conn);
             err ? rej(err) : res(_cleanResult(rows))
           });
-        });
+        })
+        .catch(e => rej(e));
     });
   }
 
@@ -76,17 +80,16 @@ class DBClient {
    * @return { Promise }
    * @throws { Promise<Error> }
    */
-  getConnection(){
-    return new Promise((res, rej) => this.connection.connect(err => err ? rej(err) : res())); 
+  getConnection(conn){
+    return new Promise((res, rej) => conn.connect(err => err ? rej(err) : res())); 
   }  
   
   /**
    * end connection
-   * @return { Promise }
-   * @throws { Promise<Error> }
+   * @throws { Error }
    */
-  endConnection(){
-    return new Promise((res, rej) => this.connection.end(err => err ? rej(err) : res()));
+  endConnection(conn){
+    conn.end(err => { if (err) throw err; })
   }
 }
 
