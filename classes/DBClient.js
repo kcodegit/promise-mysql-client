@@ -4,11 +4,12 @@
 
 'use strict';
 
-// imports
-const Promise = require('bluebird');
-const mysql   = require('mysql2');
-const pRes = e => Promise.resolve(e);
-const pRej = e => Promise.reject(e);
+// imports and vars
+var Promise = require('bluebird'),
+  mysql = require('mysql2'),
+  pRes = e => Promise.resolve(e),
+  pRej = e => Promise.reject(e),
+  p = console.log;
 
 /**
  * @param { object } DB_CONF
@@ -38,18 +39,14 @@ class DBClient {
    */
   execute(query, params) {
     return new Promise((res, rej) => {
-      var conn = new mysql.createConnection(this.CONF);
+      var conn = this.getConnection();
       arguments.length !== 2 ? rej(new Error('Invalid Arguments. execute function takes two arguments.')) :
       typeof query !== 'string' ? rej(new Error('Invalid Argument. The query needs to be string.')) :
       params.length === 0 ? rej(new Error('Empty Param. Use query() for executing raw queries.')) :
-      this.getConnection(conn)
-        .then(_ => {
-          conn.execute(query, params, (err, rows) => {
-            this.endConnection(conn);
-            err ? rej(err) : res(Array.isArray(rows) ? _cleanResult(rows) : rows);
-          });
-        })
-        .catch(e => rej(e));
+      conn.execute(query, params, (err, rows) => {
+        conn.end(err => { if (err) rej(err); });
+        err ? rej(err) : res(Array.isArray(rows) ? _cleanResult(rows) : rows);
+      });
     });
   }
 
@@ -61,36 +58,23 @@ class DBClient {
    */
   query(query) {
     return new Promise((res, rej) => {
-      var conn = new mysql.createConnection(this.CONF);
+      var conn = this.getConnection();
       arguments.length !== 1 ? rej(new Error('Invalid Arguments. query function takes one argument.')) :
       typeof query !== 'string' ? rej(new Error('Invalid Argument. The query needs to be string.')) :
-      this.getConnection(conn)
-        .then(_ => {
-          conn.query(query, (err, rows) => {
-            this.endConnection(conn);
-            err ? rej(err) : res(_cleanResult(rows))
-          });
-        })
-        .catch(e => rej(e));
+      conn.query(query, (err, rows) => {
+        conn.end(err => { if (err) rej(err); });
+        err ? rej(err) : res(Array.isArray(rows) ? _cleanResult(rows) : rows);
+      });
     });
   }
 
   /**
    * get connection
-   * @return { Promise }
-   * @throws { Promise<Error> }
+   * @return { Connection }
    */
-  getConnection(conn){
-    return new Promise((res, rej) => conn.connect(err => err ? rej(err) : res())); 
+  getConnection(){
+    return new mysql.createConnection(this.CONF);
   }  
-  
-  /**
-   * end connection
-   * @throws { Error }
-   */
-  endConnection(conn){
-    conn.end(err => { if (err) throw err; })
-  }
 }
 
 /**
