@@ -69,6 +69,18 @@ class DBClient {
   }
 
   /**
+   * 
+   * @param { Array<function> } callbacks 
+   * @returns { Promise<true> }
+   */
+  transaction(...callbacks) {
+    return Promise((res, rej) => {
+      var conn = this.getConnection();
+      
+    });
+  }
+
+  /**
    * get connection
    * @return { Connection }
    */
