@@ -1,0 +1,26 @@
+{
+  "name": "promise-mysql-client",
+  "version": "0.0.2",
+  "description": "Promise-wrapped MySQL Client for Node",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kcodegit/promise-mysql-client.git"
+  },
+  "author": "Kohei",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kcodegit/promise-mysql-client/issues"
+  },
+  "homepage": "https://github.com/kcodegit/promise-mysql-client#readme",
+  "dependencies": {
+    "chai": "^4.1.2",
+    "chai-as-promised": "^7.1.1"
+  }
+}
