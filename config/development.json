@@ -1,0 +1,34 @@
+{
+    "db": {
+	"master": {
+	    "host": "localhost",
+	    "user": "root",
+	    "password": "password"
+	    "database": "master_test",
+	    "port": 3306,
+	    "ssl": false,
+	    "connectTimeout": 5000
+	    "connectionLimit": 100
+	},
+	"slave1": {
+	    "host": "localhost",
+	    "user": "root",
+	    "password": "password"
+	    "database": "slave1_test",
+	    "port": 3306,
+	    "ssl": false,
+	    "connectTimeout": 5000
+	    "connectionLimit": 100
+	},
+	"slave2": {
+            "host": "localhost",
+            "user": "root",
+            "password": "password"
+            "database": "slave2_test",
+            "port": 3306,
+            "ssl": false,
+            "connectTimeout": 5000
+            "connectionLimit": 100
+        }
+    }
+}
