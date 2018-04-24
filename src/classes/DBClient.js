@@ -13,6 +13,7 @@ var Promise = require('bluebird'),
 
 /**
  * @param { object } DB_CONF
+ * @param { String } tag
  *  sample 
  * {
  *   "host": "localhost",
@@ -21,72 +22,68 @@ var Promise = require('bluebird'),
  *   "database": "testDB",
  *   "port": 3306,
  *   "ssl": false,
- *   "connectTimeout": 30000
+ *   "connectTimeout": 5000
+ *   "connectionLimit": 100
  * } 
  */
 class DBClient {
-  constructor(DB_CONF) {
+  constructor(DB_CONF, tag) {
+    this.pool = mysql.createPool(DB_CONF);
     this.CONF = DB_CONF;
+    this.tag = tag;
   }
 
   /**
    * executes queries.
    * execute function builds a complete query with given params.
-   * @param { string } query 
+   * @param { String } query 
    * @param { Array } params
+   * @param { MySqlConnection } conn *optional
    * @return { Promise<Array<*>> }
    * @throws { Promise<Error> }
    */
-  execute(query, params) {
+  execute(query, params, conn) {
     return new Promise((res, rej) => {
-      var conn = this.getConnection();
-      arguments.length !== 2 ? rej(new Error('Invalid Arguments. execute function takes two arguments.')) :
-      typeof query !== 'string' ? rej(new Error('Invalid Argument. The query needs to be string.')) :
-      params.length === 0 ? rej(new Error('Empty Param. Use query() for executing raw queries.')) :
-      conn.execute(query, params, (err, rows) => {
-        conn.end(err => { if (err) rej(err); });
-        err ? rej(err) : res(Array.isArray(rows) ? _cleanResult(rows) : rows);
+      if(typeof query !== 'string') return rej(new Error('Invalid Argument. The query needs to be string.'));
+      if(params.length === 0)       return rej(new Error('Empty Params. Use query() for executing raw queries.'));
+      var connection = conn ? conn : this.pool;
+      connection.execute(query, params, (err, rows) => {
+        if (err) return rej(err);
+        return res(Array.isArray(rows) ? _cleanResult(rows) : rows);
       });
     });
   }
 
   /**
    * executes raw queries.
-   * @param { string } query
+   * @param { String } query
+   * @param { MySqlConnection } conn
    * @return { Promise<Array<*>> }
    * @throws { Promise<Error> }
    */
-  query(query) {
+  query(query, conn) {
     return new Promise((res, rej) => {
-      var conn = this.getConnection();
-      arguments.length !== 1 ? rej(new Error('Invalid Arguments. query function takes one argument.')) :
-      typeof query !== 'string' ? rej(new Error('Invalid Argument. The query needs to be string.')) :
-      conn.query(query, (err, rows) => {
-        conn.end(err => { if (err) rej(err); });
-        err ? rej(err) : res(Array.isArray(rows) ? _cleanResult(rows) : rows);
+      if(typeof query !== 'string') return rej(new Error('Invalid Argument. The query needs to be string.'));
+      var connection = conn ? conn : this.pool;
+      connection.query(query, (err, rows) => {
+        if (err) return rej(err);
+        return res(Array.isArray(rows) ? _cleanResult(rows) : rows);
       });
     });
   }
 
   /**
-   * 
-   * @param { Array<function> } callbacks 
-   * @returns { Promise<true> }
-   */
-  transaction(...callbacks) {
-    return Promise((res, rej) => {
-      var conn = this.getConnection();
-      
-    });
-  }
-
-  /**
-   * get connection
+   * get a connection for transaction
    * @return { Connection }
    */
-  getConnection(){
-    return new mysql.createConnection(this.CONF);
-  }  
+  getSingleConnection(){
+    return new Promise((res, rej) => {
+      this.pool.getConnection((err, connection) => {
+        if(err) return rej(new Error("Error fetching a connection from the pool"));
+        return res(connection);
+      })
+    })
+  }
 }
 
 /**
