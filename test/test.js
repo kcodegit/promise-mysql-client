@@ -22,7 +22,8 @@ describe('DBClient', function(){
       return db_client.master.query(q)
         .then(res => {
           expect(res).to.be.an('array');
-          return res.map(e => expect(e).to.be.instanceOf(Object))
+          res.map(e => expect(e).to.be.instanceOf(Object))
+          return 
         })
     })
   })
@@ -32,15 +33,16 @@ describe('DBClient', function(){
       return db_client.master.execute(q, [1])
         .then(res => {
           expect(res).to.be.an('array');
-          return res.map(e => expect(e).to.be.instanceOf(Object))
+          res.map(e => expect(e).to.be.instanceOf(Object))
+          return 
         })
     })
   })
   describe('getSingleConnection', function(){
-    it('should return a MySqlConnection object', function(){
-      return db_client.getSingleConnection()
+    it('should return a Connection object', function(){
+      return db_client.master.getSingleConnection()
         .then(c => {
-          expect(c).to.be.instanceof(mysql.MySqlConnection);
+          expect(c).to.be.instanceof(mysql.Connection);
           c.release;
           return
         })

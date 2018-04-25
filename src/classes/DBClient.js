@@ -38,7 +38,7 @@ class DBClient {
    * execute function builds a complete query with given params.
    * @param { String } query 
    * @param { Array } params
-   * @param { MySqlConnection } conn *optional
+   * @param { Connection } conn *optional
    * @return { Promise<Array<*>> }
    * @throws { Promise<Error> }
    */
@@ -57,7 +57,7 @@ class DBClient {
   /**
    * executes raw queries.
    * @param { String } query
-   * @param { MySqlConnection } conn
+   * @param { Connection } conn *optional
    * @return { Promise<Array<*>> }
    * @throws { Promise<Error> }
    */
