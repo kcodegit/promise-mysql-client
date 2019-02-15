@@ -8,11 +8,7 @@ A Promise-wrapped mysql database client.
 
 ### npm dependencies
 ```
-npm install bluebird -S
-npm install mysql2 -S
-
-(optional)
-npm install config -S
+npm install
 ```
 
 ## Start Guide
